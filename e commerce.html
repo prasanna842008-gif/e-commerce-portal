@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple E-Commerce Portal - Single File</title>
+  <style>
+    :root{--accent:#2563eb;--muted:#6b7280}
+    body{font-family:Inter, system-ui, Arial, sans-serif;margin:0;background:#f8fafc;color:#0f172a}
+    header{background:white;box-shadow:0 1px 4px rgba(2,6,23,.06);position:sticky;top:0;z-index:10}
+    .container{max-width:1100px;margin:0 auto;padding:16px}
+    .nav{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{font-weight:700;color:var(--accent)}
+    nav ul{display:flex;gap:12px;list-style:none;padding:0;margin:0}
+    nav a{color:inherit;text-decoration:none;padding:8px 10px;border-radius:6px}
+    nav a:hover{background:#eef2ff}
+
+    main{padding:20px 0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:white;padding:12px;border-radius:8px;box-shadow:0 1px 4px rgba(2,6,23,.04)}
+    .product-img{height:160px;background:#eef2ff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--accent);margin-bottom:8px}
+    .btn{display:inline-block;padding:8px 10px;border-radius:8px;border:0;background:var(--accent);color:white;cursor:pointer}
+    .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,.12)}
+    .muted{color:var(--muted);font-size:14px}
+
+    .sidebar{width:260px}
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    .section-title{font-weight:600;margin-bottom:8px}
+
+    form input,form textarea,select{width:100%;padding:8px;border-radius:6px;border:1px solid #e6eef8;margin-top:6px}
+    .small{font-size:13px}
+    .list{list-style:none;padding:0;margin:0}
+    .list li{padding:8px 0;border-bottom:1px dashed #eef2ff}
+
+    footer{padding:20px 0;text-align:center;color:var(--muted);font-size:14px}
+
+    /* responsive */
+    @media (max-width:880px){.layout{grid-template-columns:1fr;padding:0}.sidebar{width:100%}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div style="display:flex;gap:16px;align-items:center">
+        <div class="brand">ShopWave</div>
+        <nav>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#products">Product Items</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+            <li><a href="#about">About Us</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="open-login">Login</button>
+        <button class="btn secondary" id="open-register">Register</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="home" class="card" style="margin-bottom:16px">
+      <h2>Welcome to ShopWave</h2>
+      <p class="muted">A simple single-file demo e-commerce portal. Browse products, add to wishlist, place orders, write reviews and contact customer care.</p>
+    </section>
+
+    <div class="layout">
+      <div>
+        <section id="products" class="card">
+          <h3 class="section-title">Product Items</h3>
+          <div id="product-grid" class="grid"></div>
+        </section>
+
+        <section class="card" style="margin-top:16px">
+          <h3 class="section-title">Customer Reviews & Comments</h3>
+          <div id="reviews-area">
+            <form id="review-form">
+              <label>Your name<input type="text" id="review-name" required></label>
+              <label>Product<select id="review-product"></select></label>
+              <label>Rating (1-5)<input type="number" id="review-rating" min="1" max="5" value="5"></label>
+              <label>Comment<textarea id="review-comment" rows="3"></textarea></label>
+              <div style="margin-top:8px">
+                <button class="btn" type="submit">Submit Review</button>
+              </div>
+            </form>
+            <hr style="margin:12px 0">
+            <ul id="reviews-list" class="list"></ul>
+          </div>
+        </section>
+
+        <section id="orders" class="card" style="margin-top:16px">
+          <h3 class="section-title">Orders List</h3>
+          <div id="orders-list" class="muted">No orders yet.</div>
+          <div style="margin-top:8px">
+            <button class="btn" id="download-orders">Download Orders Report (CSV)</button>
+          </div>
+        </section>
+
+      </div>
+
+      <aside class="sidebar">
+        <div class="card">
+          <h4 class="section-title">Account</h4>
+          <div id="account-area" class="muted">Not logged in</div>
+          <div style="margin-top:8px">
+            <button class="btn secondary" id="logout-btn" style="display:none">Logout</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4 class="section-title">Wishlist</h4>
+          <ul id="wishlist" class="list"><li class="muted">No items in wishlist</li></ul>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4 class="section-title">Customer Care & Reporting</h4>
+          <div class="muted">
+            <p id="contact">Email: support@shopwave.example</p>
+            <p>Phone: +91 98765 43210</p>
+          </div>
+          <div style="margin-top:8px">
+            <button class="btn" id="open-care">Open Customer Care</button>
+            <button class="btn secondary" id="download-wishlist" style="margin-left:6px">Export Wishlist (CSV)</button>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+    <section id="contact" class="card" style="margin-top:16px">
+      <h3 class="section-title">Contact Us</h3>
+      <form id="contact-form">
+        <label>Name<input type="text" id="contact-name" required></label>
+        <label>Email<input type="email" id="contact-email" required></label>
+        <label>Message<textarea id="contact-msg" rows="3" required></textarea></label>
+        <div style="margin-top:8px"><button class="btn" type="submit">Send Message</button></div>
+      </form>
+      <div id="contact-status" class="muted" style="margin-top:8px"></div>
+    </section>
+
+    <section id="about" class="card" style="margin-top:16px">
+      <h3 class="section-title">About Us</h3>
+      <p class="muted">ShopWave is a demo e-commerce site built as a single HTML file to teach full-stack beginners how a front-end can handle forms, validation, lists (orders, wishlist), reviews, and customer care interactions using local storage (no backend).</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">Made with ❤️ — Demo E-Commerce Portal</div>
+  </footer>
+
+  <!-- Modals: Login / Register / Customer Care -->
+  <div id="modal-root"></div>
+
+  <script>
+    // ===== Sample product data =====
+    const PRODUCTS = [
+      {id:1,name:'Wireless Headphones',price:1799,desc:'Comfortable Bluetooth headphones with long battery.'},
+      {id:2,name:'Smart Watch',price:2999,desc:'Track your fitness and notifications.'},
+      {id:3,name:'Laptop Backpack',price:1299,desc:'Water-resistant with multiple compartments.'},
+      {id:4,name:'Portable Speaker',price:899,desc:'Loud sound with compact size.'},
+      {id:5,name:'USB-C Charger',price:499,desc:'Fast charging for modern devices.'},
+      {id:6,name:'Gaming Mouse',price:1499,desc:'Ergonomic mouse with RGB.'}
+    ];
+
+    // ===== Helpers =====
+    const $ = (sel)=>document.querySelector(sel);
+    const $$ = (sel)=>document.querySelectorAll(sel);
+
+    // ===== Local storage wrappers =====
+    function getLS(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }catch(e){return fallback;} }
+    function setLS(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+    // Initialize storage keys
+    const USERS_KEY='sw_users', SESSION_KEY='sw_session', WISHLIST_KEY='sw_wishlist', ORDERS_KEY='sw_orders', REVIEWS_KEY='sw_reviews';
+    if(!getLS(USERS_KEY, null)) setLS(USERS_KEY, []);
+    if(!getLS(WISHLIST_KEY, null)) setLS(WISHLIST_KEY, []);
+    if(!getLS(ORDERS_KEY, null)) setLS(ORDERS_KEY, []);
+    if(!getLS(REVIEWS_KEY, null)) setLS(REVIEWS_KEY, []);
+
+    // ===== Render products =====
+    function renderProducts(){
+      const grid = $('#product-grid'); grid.innerHTML='';
+      PRODUCTS.forEach(p=>{
+        const card = document.createElement('div'); card.className='card';
+        card.innerHTML = `
+          <div class="product-img">${p.name.split(' ')[0]}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:600">${p.name}</div>
+              <div class="muted">₹${p.price} • <span style="font-size:13px">${p.desc}</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn" data-action="buy" data-id="${p.id}">Buy</button>
+              <button class="btn secondary" data-action="wish" data-id="${p.id}">Wishlist</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // ===== Wishlist =====
+    function renderWishlist(){
+      const list = getLS(WISHLIST_KEY, []);
+      const ul = $('#wishlist'); ul.innerHTML='';
+      if(!list.length) { ul.innerHTML='<li class="muted">No items in wishlist</li>'; return }
+      list.forEach(id=>{
+        const p = PRODUCTS.find(x=>x.id===id);
+        const li = document.createElement('li');
+        li.innerHTML = `${p.name} <button class="btn secondary small" data-id="${p.id}" data-action="remove-wish" style="float:right">Remove</button>`;
+        ul.appendChild(li);
+      })
+    }
+
+    // ===== Orders =====
+    function renderOrders(){
+      const orders = getLS(ORDERS_KEY, []);
+      const div = $('#orders-list');
+      if(!orders.length){ div.innerHTML='<div class="muted">No orders yet.</div>'; return }
+      const html = orders.map(o=>`<div style="padding:8px 0"><strong>Order #${o.id}</strong> — ${o.items.map(i=>i.name).join(', ')} <div class="muted small">On ${new Date(o.date).toLocaleString()}</div></div>`).join('');
+      div.innerHTML=html;
+    }
+
+    // ===== Reviews =====
+    function renderReviews(){
+      const list = getLS(REVIEWS_KEY, []);
+      const ul = $('#reviews-list'); ul.innerHTML='';
+      if(!list.length){ ul.innerHTML='<li class="muted">No reviews yet</li>'; return }
+      list.slice().reverse().forEach(r=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${escapeHtml(r.name)}</strong> on <em>${escapeHtml(r.product)}</em> — ${r.rating}/5<br><div class="muted small">${escapeHtml(r.comment)}</div>`;
+        ul.appendChild(li);
+      })
+    }
+
+    function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // ===== Account UI =====
+    function refreshAccount(){
+      const session = getLS(SESSION_KEY, null);
+      const area = $('#account-area');
+      const logoutBtn = $('#logout-btn');
+      if(session){ area.innerHTML = `<div><strong>${escapeHtml(session.name)}</strong><div class="muted small">${escapeHtml(session.email)}</div></div>`; logoutBtn.style.display='inline-block'; }
+      else{ area.innerHTML='Not logged in'; logoutBtn.style.display='none'; }
+    }
+
+    // ===== Auth Forms (client-side validation) =====
+    function openModal(html){
+      const root = $('#modal-root'); root.innerHTML = '';
+      const backdrop = document.createElement('div'); backdrop.style= 'position:fixed;inset:0;background:rgba(2,6,23,.4);display:flex;align-items:center;justify-content:center;z-index:999';
+      backdrop.innerHTML = `<div style="width:100%;max-width:520px;margin:18px">${html}</div>`;
+      backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) root.innerHTML=''; });
+      root.appendChild(backdrop);
+    }
+
+    function closeModal(){ $('#modal-root').innerHTML=''; }
+
+    function showRegister(){
+      openModal(`
+        <div class="card">
+          <h3>Register</h3>
+          <form id="register-form">
+            <label>Full name<input type="text" id="reg-name" required></label>
+            <label>Email<input type="email" id="reg-email" required></label>
+            <label>Password<input type="password" id="reg-pass" minlength="6" required></label>
+            <label>Confirm Password<input type="password" id="reg-pass2" required></label>
+            <div style="margin-top:8px;display:flex;gap:8px"><button class="btn" type="submit">Create Account</button><button class="btn secondary" type="button" id="cancel-reg">Cancel</button></div>
+            <div id="reg-msg" class="muted small" style="margin-top:8px"></div>
+          </form>
+        </div>
+      `);
+
+      $('#cancel-reg').onclick = closeModal;
+      document.getElementById('register-form').onsubmit = function(e){
+        e.preventDefault();
+        const name = $('#reg-name').value.trim();
+        const email = $('#reg-email').value.trim().toLowerCase();
+        const pass = $('#reg-pass').value; const pass2 = $('#reg-pass2').value;
+        // validation
+        if(!name || !email || !pass){ $('#reg-msg').textContent = 'Please fill all required fields.'; return }
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ $('#reg-msg').textContent = 'Invalid email format.'; return }
+        if(pass.length < 6){ $('#reg-msg').textContent = 'Password must be at least 6 characters.'; return }
+        if(pass !== pass2){ $('#reg-msg').textContent = 'Passwords do not match.'; return }
+        // save user
+        const users = getLS(USERS_KEY, []);
+        if(users.find(u=>u.email===email)){ $('#reg-msg').textContent = 'An account with this email already exists.'; return }
+        users.push({id:Date.now(),name,email,password:pass}); setLS(USERS_KEY, users);
+        $('#reg-msg').textContent = 'Account created. You can now login.'; setTimeout(()=>{ closeModal(); },900);
+      }
+    }
+
+    function showLogin(){
+      openModal(`
+        <div class="card">
+          <h3>Login</h3>
+          <form id="login-form">
+            <label>Email<input type="email" id="login-email" required></label>
+            <label>Password<input type="password" id="login-pass" required></label>
+            <div style="margin-top:8px;display:flex;gap:8px"><button class="btn" type="submit">Login</button><button class="btn secondary" type="button" id="cancel-login">Cancel</button></div>
+            <div id="login-msg" class="muted small" style="margin-top:8px"></div>
+          </form>
+        </div>
+      `);
+      $('#cancel-login').onclick = closeModal;
+      $('#login-form').onsubmit = function(e){
+        e.preventDefault();
+        const email = $('#login-email').value.trim().toLowerCase();
+        const pass = $('#login-pass').value;
+        const users = getLS(USERS_KEY, []);
+        const user = users.find(u=>u.email===email && u.password===pass);
+        if(!user){ $('#login-msg').textContent = 'Invalid email or password.'; return }
+        setLS(SESSION_KEY, {id:user.id,name:user.name,email:user.email}); closeModal(); refreshAccount();
+      }
+    }
+
+    // ===== Customer Care Modal =====
+    function showCustomerCare(){
+      openModal(`
+        <div class="card">
+          <h3>Customer Care</h3>
+          <p class="muted">You can send a quick message to our support team. (This demo stores messages locally.)</p>
+          <form id="care-form">
+            <label>Name<input type="text" id="care-name"></label>
+            <label>Email<input type="email" id="care-email"></label>
+            <label>Issue<textarea id="care-msg" rows="3"></textarea></label>
+            <div style="margin-top:8px"><button class="btn" type="submit">Send</button><button class="btn secondary" type="button" id="close-care" style="margin-left:6px">Close</button></div>
+            <div id="care-status" class="muted small" style="margin-top:8px"></div>
+          </form>
+        </div>
+      `);
+      $('#close-care').onclick = closeModal;
+      $('#care-form').onsubmit = function(e){
+        e.preventDefault();
+        $('#care-status').textContent = 'Message sent to support (saved locally).';
+        setTimeout(closeModal,800);
+      }
+    }
+
+    // ===== Attach events =====
+    document.getElementById('open-register').onclick = showRegister;
+    document.getElementById('open-login').onclick = showLogin;
+    document.getElementById('open-care').onclick = showCustomerCare;
+
+    document.getElementById('logout-btn').onclick = function(){ localStorage.removeItem(SESSION_KEY); refreshAccount(); }
+
+    // Product actions: buy / wishlist
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('button'); if(!btn) return;
+      const action = btn.dataset.action; const id = Number(btn.dataset.id);
+      if(action==='wish'){
+        const list = getLS(WISHLIST_KEY, []);
+        if(list.includes(id)) return; list.push(id); setLS(WISHLIST_KEY, list); renderWishlist(); alert('Added to wishlist');
+      }
+      if(action==='remove-wish'){
+        let list = getLS(WISHLIST_KEY, []); list = list.filter(x=>x!==id); setLS(WISHLIST_KEY, list); renderWishlist();
+      }
+      if(action==='buy'){
+        const session = getLS(SESSION_KEY, null);
+        if(!session){ if(confirm('You must login to place an order. Open login?')) showLogin(); return }
+        const prod = PRODUCTS.find(p=>p.id===id);
+        const orders = getLS(ORDERS_KEY, []);
+        const order = {id:orders.length+1, items:[{id:prod.id,name:prod.name,price:prod.price}], date: new Date().toISOString()};
+        orders.push(order); setLS(ORDERS_KEY, orders); renderOrders(); alert('Order placed! Order #' + order.id);
+      }
+    });
+
+    // Review form
+    document.getElementById('review-form').onsubmit = function(e){
+      e.preventDefault();
+      const name = $('#review-name').value.trim() || 'Anonymous';
+      const productId = Number($('#review-product').value);
+      const product = PRODUCTS.find(p=>p.id===productId)?.name || 'Unknown';
+      const rating = Number($('#review-rating').value) || 5; const comment = $('#review-comment').value.trim();
+      const reviews = getLS(REVIEWS_KEY, []);
+      reviews.push({name,product,rating,comment,date:new Date().toISOString()}); setLS(REVIEWS_KEY, reviews);
+      $('#review-form').reset(); renderReviews(); alert('Thanks for your review!');
+    }
+
+    // Contact form
+    $('#contact-form').onsubmit = function(e){
+      e.preventDefault(); const n=$('#contact-name').value.trim(); const em=$('#contact-email').value.trim(); const msg=$('#contact-msg').value.trim();
+      if(!n || !em || !msg){ $('#contact-status').textContent = 'Please fill all fields.'; return }
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ $('#contact-status').textContent = 'Invalid email.'; return }
+      $('#contact-status').textContent = 'Message sent (saved locally).'; this.reset();
+    }
+
+    // Populate review product select
+    function populateReviewProducts(){ const sel = $('#review-product'); sel.innerHTML=''; PRODUCTS.forEach(p=>{ const op = document.createElement('option'); op.value=p.id; op.textContent = p.name; sel.appendChild(op); }) }
+
+    // ===== Export CSV utilities =====
+    function toCSV(rows){ return rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'); }
+    function downloadFile(filename,content){ const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(content); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); }
+
+    $('#download-orders').onclick = function(){ const orders = getLS(ORDERS_KEY,[]); if(!orders.length){ alert('No orders to export'); return }
+      const rows = [['Order ID','Items','Date']]; orders.forEach(o=> rows.push([o.id, o.items.map(i=>i.name).join('; '), new Date(o.date).toLocaleString()])); downloadFile('orders_report.csv', toCSV(rows));
+    }
+
+    $('#download-wishlist').onclick = function(){ const list = getLS(WISHLIST_KEY,[]); if(!list.length){ alert('No wishlist items'); return } const rows=[['Product ID','Name','Price']]; list.forEach(id=>{const p=PRODUCTS.find(x=>x.id===id); rows.push([p.id,p.name,p.price]);}); downloadFile('wishlist.csv', toCSV(rows)); }
+
+    // ===== Init =====
+    function init(){ renderProducts(); renderWishlist(); renderOrders(); renderReviews(); populateReviewProducts(); refreshAccount(); }
+    init();
+  </script>
+</body>
+</html>
